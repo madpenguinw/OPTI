@@ -1,4 +1,5 @@
 import itertools
+# удалить отладочные принты
 
 
 def turbine():
@@ -6,10 +7,8 @@ def turbine():
     Функция для чтения из txt файла, обработки и возращения
     задаваемых, общих для всей турбины, параметров
     """
+
     data_list = []
-    return_data_list = []
-    P_0_list = []  #  надо вынести в main()
-    Y_2_list = []  # этот список используется и в другой функции, его надо вынести в main()
 
     with open('text.txt', 'r') as file:
         # Для турбины в целом задается 9 величин (line)
@@ -18,7 +17,7 @@ def turbine():
         err_begin = 'Вы задали'
         err_end = 'запишите в файл верное значение'
         text_condition_err = 'Проверьте, что выполняется условие:'
-        text_where_х = 'где х - задаваемая величина'
+        text_where_х = 'где х - задаваемая величина \n'
         text_float_value_err = 'ValueError: проверьте, что при задании величины Вы использовали точку для отделения дробной части'
         text_int_value_err = 'ValueError: проверьте, что вы ввели целое число, а не дробное'
         value_error = 0
@@ -47,7 +46,6 @@ def turbine():
             if not 1000 <= P_2 <= 1000000:
                 print(f'{warning} \n{text_condition_err} 1000 <= x <= 1000000, {text_where_х}')
             print(P_2)
-            P_0_list.append(P_2)  # Список!!!!!!!
         except ValueError:
             print(f'{warning} \n{text_float_value_err}')
             value_error = 1
@@ -84,7 +82,6 @@ def turbine():
             if not 0 < Y_1 <= 20:
                 print(f'{warning} \n{text_condition_err} 0 < Y_1 <= 20, {text_where_х}')
             print(Y_1)
-            Y_2_list.append(Y_1)  # начиная с 1-й ступени к Y_1 можно обратиться по индексу [-2]
         except ValueError:
             print(f'{warning} \n{text_float_value_err}')
             value_error = 1
@@ -110,10 +107,152 @@ def turbine():
         if value_error == 1:
             return False
 
-        # Протестировать
+        return_data_list = []
         return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r])
 
         return return_data_list
+
+
+def input_turbine():
+    """
+    Функция для ручного ввода, обработки и возращения
+    задаваемых, общих для всей турбины, параметров
+    """
+
+    err_begin = 'Вы задали'
+    err_end = 'введите верное значение'
+    text_condition_err = 'Проверьте, что выполняется условие:'
+    text_where_х = 'где х - задаваемая величина \n'
+    text_float_value_err = 'ValueError: проверьте, что при задании величины Вы использовали точку для отделения дробной части'
+    text_int_value_err = 'ValueError: проверьте, что вы ввели целое число, а не дробное'
+    value_error = 0
+
+    warning = f'{err_begin} неверное количество ступеней, {err_end}'
+    j = -1
+    while j < 0:
+        try:
+            j = int(input('Введите число ступеней турбины (не более 13). \n'))
+            while j not in range(1, 14):
+                j = int(input(f'{warning} \n{text_condition_err} 1 <= x <= 13, {text_where_х}'))
+            print(j)
+        except ValueError:
+            print(f'{warning} \n{text_int_value_err}')
+            j = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверную чacтoту вpaщeния poтopa (об/мин), {err_end}'
+    n = -1
+    while n < 0:
+        try:
+            n = int(input('Введите чacтoту вpaщeния poтopa (об/мин). \n'))
+            while not 0 < n <= 120000:
+                n = int(input(f'{warning} \n{text_condition_err} 0 < x <= 120000, {text_where_х}'))
+            print(n)
+        except ValueError:
+            print(f'{warning} \n{text_int_value_err}')
+            n = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверное дaвлeниe гaзa зa тypбинoй (Па), {err_end}'
+    P_2 = -1
+    while P_2 < 0:
+        try:
+            P_2 = float(input('Введите дaвлeниe гaзa зa тypбинoй (Па). \n'))
+            while not 1000 <= P_2 <= 1000000:
+                P_2 = float(input(f'{warning} \n{text_condition_err} 1000 <= x <= 1000000, {text_where_х}'))
+            print(P_2)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            P_2 = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверное дaвлeниe торможения перед тypбинoй (Па), {err_end}'
+    P_0_z = -1
+    while P_0_z < 0:
+        try:
+            P_0_z = float(input('Введите давление торможения перед турбиной (Па). \n'))
+            while not 0 < P_0_z <= 40000000:
+                P_0_z = float(input(f'{warning} \n{text_condition_err} 0 < x <= 40000000, {text_where_х}'))
+            print(P_0_z)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            P_0_z = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверный рacxoд гaзa (пара) нa вxoдe в тypбинy (кг/с), {err_end}'
+    G_0_1 = -1
+    while G_0_1 < 0:
+        try:
+            G_0_1 = float(input('Введите рacxoд гaзa (пара) нa вxoдe в тypбинy (кг/с). \n'))
+            while not 0 < G_0_1 <= 2000:
+                G_0_1 = float(input(f'{warning} \n{text_condition_err} 0 < x <= 2000, {text_where_х}'))
+            print(G_0_1)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            G_0_1 = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверную тeмпepaтypу тopмoжeния пepeд тypбинoй (К), {err_end}'
+    T_0_z = -1
+    while T_0_z < 0:
+        try:
+            T_0_z = float(input('Введите тeмпepaтypу тopмoжeния пepeд тypбинoй (К). \n'))
+            while not 0 < T_0_z <= 2200:
+                T_0_z = float(input(f'{warning} \n{text_condition_err} 0 < x <= 2200, {text_where_х}'))
+            print(T_0_z)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            T_0_z = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверную влажность на входе в туpбину (%), {err_end}'
+    Y_1 = -1
+    while Y_1 < 0:
+        try:
+            Y_1 = float(input('Введите влажность на входе в туpбину (%) \n'
+                                '(для газовой турбины введите 0). \n'))
+            while not 0 < Y_1 <= 20:
+                Y_1 = float(input(f'{warning} \n{text_condition_err} 0 < x <= 20, {text_where_х}'))
+            print(Y_1)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            Y_1 = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверный коэффициент изoэнтpoпы для гaзa, {err_end}'
+    k_g = -1
+    while k_g < 0:
+        try:
+            k_g = float(input('Введите коэффициент изoэнтpoпы для гaзa. \n'))
+            while not 0 < k_g:
+                k_g = float(input(f'{warning} \n{text_condition_err} 0 < x, {text_where_х}'))
+            print(k_g)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            k_g = -1
+            value_error = 1
+    ###
+    warning = f'{err_begin} неверное значение газовой постоянной, {err_end}'
+    R_r = -1
+    while R_r < 0:
+        try:
+            R_r = float(input('Введите значение газовой постоянной () \n'))
+            while not 0 < R_r:
+                R_r = float(input(f'{warning} \n{text_condition_err} 0 < x, {text_where_х}'))
+            print(R_r)
+        except ValueError:
+            print(f'{warning} \n{text_float_value_err}')
+            R_r = -1
+            value_error = 1
+    ###
+
+    if value_error == 1:
+        return False
+
+    return_data_list = []
+    return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r])
+
+    return return_data_list
 
 
 def stage():
@@ -132,7 +271,7 @@ def stage():
         err_begin = 'Вы задали'
         err_end = 'запишите в файл верное значение'
         text_condition_err = 'Проверьте, что выполняется условие:'
-        text_where_х = 'где х - задаваемая величина'
+        text_where_х = 'где х - задаваемая величина \n'
         text_float_value_err = 'ValueError: проверьте, что при задании величины Вы использовали точку для отделения дробной части'
         text_int_value_err = 'ValueError: проверьте, что вы ввели целое число, а не дробное'
         value_error = 0
@@ -252,5 +391,6 @@ def stage():
 
 
 if __name__ == '__main__':
-    print(turbine())
-    print(stage())
+    # print(turbine())
+    # print(stage())
+    print(input_turbine())
