@@ -25,19 +25,24 @@ Y_2_list = []
 def main():
 
     # Исходные данные
-
     file = input('Считать исходные данные из подготовленного файла text.txt? \n'
                  '(Введите "yes", если да, или "no", если нет)')
 
     # Для турбины в целом
-    if file == 'yes':
-        print('Начинается чтение из файла text.txt')
-        data_list = turbine()
-        j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = data_list
-    elif file == 'no':
-        print('Начинается ручной ввод данных для турбины в целом')
-        data_list = input_turbine()
-        j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = data_list
+    while file not in ['yes', 'no']:
+        if file == 'yes':
+            print('Начинается чтение из файла text.txt')
+            data_list = turbine()
+            j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = data_list
+        elif file == 'no':
+            print('Начинается ручной ввод данных для турбины в целом')
+            data_list = input_turbine()
+            j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = data_list
+        else:
+            while file not in ['yes', 'no']:
+                file = input('Вы ввели неверное значение. \n'
+                             'Введите "yes", если хотите считать данные из подготовленного файла text.txt \n'
+                             'Введите "no", если хотите вводить данные вручную')
 
     P_0_list.append(P_2)
     Y_2_list.append(Y_1)  # начиная с 1-й ступени к Y_1 можно обратиться по индексу [-2]
