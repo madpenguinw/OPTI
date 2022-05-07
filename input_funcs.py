@@ -10,7 +10,7 @@ def turbine():
 
     data_list = []
 
-    with open('text.txt', 'r') as file:
+    with open('data.txt', 'r') as file:
         # Для турбины в целом задается 9 величин (line)
         for line in itertools.islice(file, 0, 9):
             data_list.append(line)
@@ -227,7 +227,7 @@ def input_turbine():
     R_r = -1
     while R_r < 0:
         try:
-            R_r = float(input('Введите значение газовой постоянной () \n'))
+            R_r = float(input('Введите значение газовой постоянной (Дж/кг*К) \n'))
             while not 0 < R_r:
                 R_r = float(input(f'{warning} \n{text_condition_err} 0 < x, {text_where_х}'))
             print(R_r)
@@ -256,7 +256,7 @@ def input_stage(current_stage):
     text_int_value_err = 'ValueError: проверьте, что вы ввели целое число, а не дробное'
     value_error = 0
 
-    print(f'Для {current_stage} ступени:')
+    # print(f'Для {current_stage} ступени:')
     ###
     warning = f'{err_begin} неверную выcoту направляющей лопатки (м), {err_end}'
     l_1 = -1
@@ -347,8 +347,8 @@ def input_stage(current_stage):
     while h_0 < 0:
         try:
             h_0 = float(input('Введите рacпoлaгaeмый пepeпaд энтaльпий (Дж/кг). \n'))
-            while not 0 < h_0 < 30000:
-                h_0 = float(input(f'{warning} \n{text_condition_err} 0 < x < 30000, {text_where_х}'))
+            while not 0 < h_0 < 300000:
+                h_0 = float(input(f'{warning} \n{text_condition_err} 0 < x < 300000, {text_where_х}'))
             print(h_0)
         except ValueError:
             print(f'{warning} \n{text_float_value_err}')
@@ -408,7 +408,7 @@ def stage(current_stage):
 
     input_data_list = []
 
-    with open('text.txt', 'r') as file:
+    with open('data.txt', 'r') as file:
         # Задаваемые величины для первой ступени находятся на 9-ой строчке файла
         i = current_stage
         while i == current_stage:
@@ -494,8 +494,8 @@ def stage(current_stage):
         warning = f'{err_begin} неверный рacпoлaгaeмый пepeпaд энтaльпий (Дж/кг), {err_end}'
         try:
             h_0 = float(h_0)
-            if not 0 < h_0 < 30000:
-                print(f'{warning} \n{text_condition_err} 0 < x < 30000, {text_where_х}')
+            if not 0 < h_0 < 300000:
+                print(f'{warning} \n{text_condition_err} 0 < x < 300000, {text_where_х}')
             print(h_0)
         except ValueError:
             print(f'{warning} \n{text_float_value_err}')
