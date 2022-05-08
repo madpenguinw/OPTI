@@ -1,7 +1,7 @@
 import math as m
 from sre_constants import MIN_REPEAT_ONE
 
-from input_funcs import input_stage, input_turbine, stage, turbine
+from input_funcs import Input_funcs
 
 
 #  Вопросы:
@@ -15,54 +15,66 @@ from input_funcs import input_stage, input_turbine, stage, turbine
 # sh - штрих - параметр в корневом сечении ступени
 # 2sh - 2 штриха - параметр в переферийном сечении ступени
 
-# заданные величины:
+def test_variable(variable, name):
+    try:
+        if variable > 0:
+            return True
+        else:
+            print(f'Ошибка: {name} = {variable}')
+            return False
+    except TypeError:
+        print('TypeError!!!')
+        print(f'{name} =  {variable}')
+        return False
 
 
-P_0_list = []
 Y_2_list = []
 
 
 def main():
 
     # Исходные данные
-    file = input('Считать исходные данные из подготовленного файла text.txt? \n'
-                 '(Введите "yes", если да, или "no", если нет)  \n')
+    file = ''
+    text = ('Считать исходные данные из подготовленного файла text.txt? \n'
+            '(Введите "yes", если да, или "no", если нет) \n')
+    while file not in ['yes', 'no']:
 
-    # Для турбины в целом
+        file = input(text)
 
-    if file == 'yes':
-        print('Начинается чтение из файла text.txt')
-        turbine_data_list = turbine()
-        j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = turbine_data_list
-    elif file == 'no':
-        print('Начинается ручной ввод данных для турбины в целом')
-        turbine_data_list = input_turbine()
-        j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = turbine_data_list
-    else:
-        while file not in ['yes', 'no']:
-            file = input('Вы ввели неверное значение. \n'
-                         'Введите "yes", если хотите считать данные из подготовленного файла text.txt \n'
-                         'Введите "no", если хотите вводить данные вручную')
+        # Для турбины в целом
 
-    P_0_list.append(P_2)
+        if file == 'yes':
+            print('Начинается чтение из файла text.txt')
+            turbine_data_list = Input_funcs.turbine()
+            j, n, P_2_last, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = turbine_data_list
+        elif file == 'no':
+            print('Начинается ручной ввод данных для турбины в целом')
+            turbine_data_list = Input_funcs.input_turbine()
+            j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r = turbine_data_list
+        else:
+            text = ('Вы ввели неверное значение. \n'
+                    'Введите "yes", если хотите считать данные из подготовленного файла text.txt \n'
+                    'Введите "no", если хотите вводить данные вручную \n')
+
     Y_2_list.append(Y_1)  # начиная с 1-й ступени к Y_1 можно обратиться по индексу [-2]
 
     # Объявление списков перед циклом
     N_list = []
     N_t_list = []
     alfa_list = []
+    P_0_list = []
 
     # Для отдельной ступени
     for current_stage in range(1, j + 1):
 
         if file == 'yes':
-            stage_data_list = stage(current_stage)
+            stage_data_list = Input_funcs.stage(current_stage)
             (l_1, l_2, d_1, d_2, z_1, z_2, Y_2,
              h_0, rho_t, G_0_otn, bandage) = stage_data_list
         elif file == 'no':
             print('Начинается ручной ввод данных для каждой ступени \n'
                   f'Для {current_stage} ступени:')
-            stage_data_list = input_stage(current_stage)
+            stage_data_list = Input_funcs.input_stage()
             (l_1, l_2, d_1, d_2, z_1, z_2, Y_2,
              h_0, rho_t, G_0_otn, bandage) = stage_data_list
 
@@ -71,6 +83,7 @@ def main():
         # Расчетные формулы
 
         # Сечение I-I
+        print('\nРасчет ступени', current_stage)
 
         # 1) Теоретическая скорость смеси газа и охлаждающего воздуха С_1_t
         C_0 = m.sqrt(2 * h_0)  # условная скорость
@@ -100,7 +113,7 @@ def main():
         T_1_z = (C_pr * T_0_z + G_v_1_otn * C_pv * T_1_v_z) / (C_pr + G_v_1_otn * C_pv)
 
         # 6) Температура смеси
-        T_1 = T_1_z - C_1**2 / (2 * C_pr)
+        T_1 = T_1_z - (C_1**2) / (2 * C_pr)
 
         # 7) Давление смеси в конце изоэнтропного расширения
         P_1 = P_0_z * (T_1_t / T_0_z)**(k_g / (k_g - 1))
@@ -109,7 +122,7 @@ def main():
         P_1_z = P_1 * (T_1_z / T_1)**(k_g / (k_g - 1))
 
         # 9) плотность смеси
-        rho_1 = P_1 / (R_r - T_1)
+        rho_1 = P_1 / (R_r * T_1)
 
         # 10) Расход утечки рабочего тела через лабиринтовое уплотнение НА
         d_y_t_sh = 0.3  # (300 мм). диаметр лабиринта
@@ -128,9 +141,19 @@ def main():
         T_1_t_sh = T_0_z - C_1_t_sh ** 2 / (2 * C_pr)  # Температура в конце изоэнтропинйного расширения от давления P_0_z до P_1_sh
         P_1_sh = P_0_z * (T_1_t_sh / T_0_z) ** (k_g / (k_g - 1))  # давление в потоке у корня НЛ
         #############
-        P_0 = P_0_list[-1]
-        print('check', P_0**2, P_1_sh**2, P_0**2 - P_1_sh**2)
-        G_y_t_sh = m.pi * mi_y_t * k_y_t * d_1_sh * delta_y_t_sh * m.sqrt((P_0_z**2 - P_1_sh**2) / (R_r * T_0_z * z_ypl))  # ВОПРОС ИСПРАВИЛ ОПЕЧАТКУ (P_0**2 на P_0_z**2)!!!!
+        if current_stage == 1:
+            P_0 = P_0_z
+        else:
+            P_0 = P_0_list[-1]
+        G_y_t_sh = m.pi * mi_y_t * k_y_t * d_1_sh * delta_y_t_sh * m.sqrt((P_0**2 - P_1_sh**2) / (R_r * T_0_z * z_ypl))
+        print(
+            'P_0**2 =', P_0**2,
+            'P_0 =', P_0,
+            'P_1_sh**2 =', P_1_sh**2,
+            '(P_0**2 - P_1_sh**2) =', (P_0**2 - P_1_sh**2),
+            '(R_r * T_0_z * z_ypl) =',  (R_r * T_0_z * z_ypl),
+        )
+
 
         # 11) Расход рабочего тела в сечении I-I
         #  ВОПРОС (Откуда брать G_0, G_v_1)
@@ -138,22 +161,35 @@ def main():
         G_v_1 = 0  # для газовой турбины уточнить
         G_v_1_otn = G_v_1 / G_0  # задается предварительно
         G_1 = G_0_1 * G_0_otn * (1 + G_v_1_otn) - G_y_t_sh
+        # print(
+        #     'G_1 =', G_1,
+        #     'G_0_1 =', G_0_1,
+        #     'G_0_otn =', G_0_otn,
+        #     '(1 + G_v_1_otn) =', (1 + G_v_1_otn),
+        #     ' G_y_t_sh =',  G_y_t_sh,
+        # )
 
         # 12) Угол потока в сечении I-I в абсолютном движении
+        # print('ПРИНТЫ!!!!')
+        # print(G_1, 'G_1')
+        # print(d_1, 'd_1')
+        # print(l_1, 'l_1')
+        # print(rho_1, 'rho_1')
+        # print(C_1, 'C_1')
         alfa_1 = m.asin(G_1 / (m.pi * d_1 * l_1 * rho_1 * C_1))
+        alfa_1_grad = alfa_1 * 180 / m.pi
 
         # 13) Коэффициент профильных потерь, обусловленных геометрией НЛ
         if not alfa_list:
-            alfa_0 = 90  # ВОПРОС (уточнить, 90 ли в первой ступени)
+            alfa_0 = 1.571  # 90 градусов в радинах ВОПРОС (уточнить, 90 ли в первой ступени)
         else:
             alfa_0 = alfa_list[-1]
         # alfa_0 - угол входа потока в НЛ, отсчитывается от отрицательного направления переносной скорости u
-        L_1 = ((alfa_0 + alfa_1) ** (0.04)) * m.sin(alfa_0 / m.sin(alfa_1))
+        L_1 = ((alfa_0 + alfa_1) ** (0.04)) * m.sin(alfa_0) / m.sin(alfa_1)
         t_1 = m.pi * d_1 / z_1  # шаг НЛ
         a_1 = t_1 * m.sin(alfa_1)
-        S_1 = 0.001  #  принимаем равным 1мм - средняя толщина выходных кромок НЛ
+        S_1 = 0.001  #  принимаем равным 1мм - средняя толщина выходных кромок НЛ (Атлас профилей)
         S_1_otn = S_1 / a_1  # задается, относительная толщина выходных кромок НЛ
-        # Атлас профилей
         dzeta_1_pr_r = 1.2 / (L_1 ** 2) + (8 * 10 ** (-6)) * (L_1 ** 2) + 0.38 * (S_1_otn ** 2) + 0.034 * S_1_otn + 0.035
 
         # 14)  Число Маха по скорости C_1
@@ -193,6 +229,9 @@ def main():
             delta_dzeta_1_pr_Re = 2100 / Re_c_1 - 0.0021
 
         # 22)  Коэффициент профильных потерь
+        print('dzeta_1_pr_r =', dzeta_1_pr_r)
+        print('delta_dzeta_1_pr_M =', delta_dzeta_1_pr_M)
+        print('delta_dzeta_1_pr_Re =', delta_dzeta_1_pr_Re)
         dzeta_1_pr = dzeta_1_pr_r + delta_dzeta_1_pr_M + delta_dzeta_1_pr_Re
 
         # 23)  Коэффициент вторичных потерь
@@ -206,6 +245,11 @@ def main():
         Y_sa = delta_Y * (1 - rho_t)  # влажность в сопловом аппарате
         Y_sa_sr = (Y_1 + Y_sa) / 2  # средняя влажность в сопловом аппарате
 
+        print('dzeta_1_pr =', dzeta_1_pr)
+        print('dzeta_1_vt =', dzeta_1_vt)
+        print('G_v_1_otn =', G_v_1_otn)
+        print('(1 - C_v_1_otn) ** 2 =', (1 - C_v_1_otn) ** 2)
+        print('Y_sa_sr =', Y_sa_sr)
         dzeta_1 = dzeta_1_pr + dzeta_1_vt + G_v_1_otn * ((1 - C_v_1_otn) ** 2) + Y_sa_sr
 
         # 25) Коэффициент скорости для НЛ (ВОПРОС:  эту формулу не использую?)
@@ -221,6 +265,7 @@ def main():
         # n - задается, частота вращения ротора
         U_1 = m.pi * d_1 * n / 60  # Окружная скорость
         beta_1 = m.atan(C_1_z / (C_1_u - U_1))
+        beta_1_grad = beta_1 * 180 / m.pi
 
         # 28) Относительная скорость потока в сечении I-I
         W_1 = C_1_z / m.sin(beta_1)
@@ -233,9 +278,9 @@ def main():
 
         # Cечение 2-2
 
-        # 31) Температура торможения потока в относительном движении в сечении 2-2
+        # 31) Температура торможения потока в относительном движении в сечении 2-2 ВОПРОС (T_w_2_z получается больше, чем T_w_1_z. Это правильно?)
         U_2 = m.pi * d_2 * n / 60  # окружная скорость
-        T_w_2_z = T_w_1_z - ((U_1 ** 2) - (U_2 ** 2) / (2 * C_pr))
+        T_w_2_z = T_w_1_z - ((U_1 ** 2) - (U_2 ** 2)) / (2 * C_pr)
 
         # 32) Теоретическое давление торможения потока в относительном движении
         P_w_2_t_z = P_w_1_z + ((T_w_2_z / T_w_1_z) ** (k_g / (k_g - 1)))
@@ -245,6 +290,7 @@ def main():
 
         # 34) Теоретическая скорость смеси
         W_2_t = m.sqrt(2 * rho_t * h_0 * T_1 / T_1_t + (W_1 ** 2) - (U_1 ** 2) + (U_1 ** 2))
+        test_variable(W_2_t, 'W_2_t')
 
         # 35) Скорость смеси
         # Psi = W_2 / W_2_t
@@ -254,21 +300,37 @@ def main():
 
         # 36) Температура потока в конце изоэнтропийного расширения
         T_2_t = T_w_2_z - (W_2_t ** 2) / (2 * C_pr)
+        # print('T_w_2_z = ', T_w_2_z, '(W_2_t ** 2) / (2 * C_pr) = ', (W_2_t ** 2) / (2 * C_pr))
+        test_variable(T_2_t, 'T_2_t')
 
         # 37) Температура смеси
         T_2 = T_w_2_cm_z - (W_2 ** 2) / (2 * C_pr)
+        test_variable(T_2, 'T_2')
 
-        # 38) Давление смеси ВОПРОС (это то же P_2, что и в Дано или нет?)
-        P_2 = P_w_2_t_z * ((T_2_t / T_w_2_z) ** (k_g / (k_g - 1)))
+        # 38) Давление смеси ВОПРОС (это то же P_2, что и в Дано или нет? Если да, то для последней ступени брать значение из Дано?)
+        if current_stage == j:
+            P_2 = P_2_last
+        else:
+            P_2 = P_w_2_t_z * ((T_2_t / T_w_2_z) ** (k_g / (k_g - 1)))
+            P_0_list.append(P_2)
 
         # 39) Плотность смеси
         rho_2 = P_2 / (R_r * T_2)
+        test_variable(P_2, 'P_2')
+        test_variable(R_r, 'R_r')
+        test_variable(T_2, 'T_2')
 
         # 40) Расход рабочего тела в сечении 2-2
         G_2 = G_0 * G_0 / G_1 * (1 + G_v_1_otn + G_v_2_otn)
 
         # 41) Угол потока в сечении 2-2 в относительном движении
+        test_variable(G_2, 'G_2')
+        test_variable(d_2, 'd_2')
+        test_variable(l_2, 'l_2')
+        test_variable(rho_2, 'rho_2')
+        test_variable(W_2, 'W_2')
         beta_2 = m.asin(G_2 / (m.pi * d_2 * l_2 * rho_2 * W_2))
+        beta_2_grad = beta_2 * 180 / m.pi
 
         # 43) Число Маха по скорости W_2
         M_w_2 = W_2 / m.sqrt(k_g * R_r * T_2)
@@ -290,6 +352,9 @@ def main():
         # 42) Коэффициент профильных потерь, обусловленный геометрией РЛ
         L_2 = ((beta_1 + beta_2) ** 0.4) * m.sin(beta_1) / m.sin(beta_2)
         a_2 = t_2 * m.sin(beta_2)  # горло РЛ
+        S_2 = 0.001  # принимаем равным 1мм - средняя толщина выходных кромок РЛ ВОПРОС (это можно уточнить в атласе профилей)
+        S_2_otn = S_2 / a_2  # относительная величина входных кромок РЛ
+        dzeta_2_pr_r = 1.2 / (L_2 ** 2) + 8 * (10 ** (-6)) * (L_2 ** 2) + 0.38 * (S_2_otn ** 2) + 0.034 * S_2_otn + 0.049
 
         # 47) Хорда РЛ
         b_2 = t_2 / t_2_otn
@@ -300,6 +365,7 @@ def main():
         # 49) Число Рейнольдса для потока в РЛ
         Re_w_2 = W_2 * b_2 * rho_2 / mi_2
 
+
         # 50) Увеличение профильных потерь под влиянием числа Re
         if Re_w_2 >= 10 ** (6):
             delta_dzeta_2_pr_Re = 0
@@ -307,9 +373,6 @@ def main():
             delta_dzeta_2_pr_Re = 2100 / Re_w_2 - 0.0021
 
         # 51) Коэффициент профильных потерь
-        # перенесенные формулы
-        dzeta_2_otn = dzeta_2 / a_2  # задается, относительная величина входных кромок РЛ
-        dzeta_2_pr_r = 1.2 / (L_2 ** 2) + 8 * (10 ** (-6)) * (L_2 ** 2) + 0.38 * (dzeta_2_otn ** 2) + 0.034 * dzeta_2_otn + 0.049
         # не дельта, в методичке опечатка
         dzeta_2_pr = dzeta_2_pr_r + delta_dzeta_2_pr_m + delta_dzeta_2_pr_Re
 
@@ -368,6 +431,8 @@ def main():
 
         # 61) Угол выхода потока из РК в абсолютном движении
         alfa_2 = m.atan(W_2_z / (W_2_u - U_2))
+        alfa_2_grad = alfa_2 * 180 / m.pi
+
         alfa_list.append(alfa_2)
 
         # 62) Абсолютная скорость выхода потока из РК
@@ -430,47 +495,46 @@ def main():
         kpd_y_z = N / N_t
 
         # Вывод результатов расчета ступени
-        # ВСЕ ПРИНТЫ НУЖНО ОКРУГЛИТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        print(f'Результаты расчета ступени {current_stage} \n'
-              f'G_1 = {G_1} кг/с \n'
-              f'U_1 = {U_1} м/с \n'
-              f'C_1 = {C_1} м/с \n'
-              f'alfa_1 = {alfa_1} град. \n'
-              f'T_1 = {T_1} К \n'
-              f'T_1_z = {T_1_z} К \n'
-              f'T_w_1_z = {T_w_1_z} К \n'  # Температура на выходе потока из соплового аппарата в относительном движении
-              f'P_1 = {P_1} Па \n'
-              f'W_1 = {W_1} м/с \n'
-              f'beta_1 = {beta_1} град. \n'
-              f'M_c_1 = {M_c_1} \n'
-              f'Re_c_1 = {Re_c_1} \n'
-              f'b_1 = {b_1} м \n'
-              f't_1 / b_1 = {t_1_otn} \n'  # относительный шаг профиля
-              f'dzeta_1_n = {dzeta_1} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 24)). отношение потерь в сопловом аппарате к располагаемому перепаду на СА
-              f'P_1_z = {P_1_z} Па \n'
+        print(f'\nРезультаты расчета ступени {current_stage} \n'
+              f'G_1 = {round(G_1, 2)} кг/с \n'
+              f'U_1 = {round(U_1, 1)} м/с \n'
+              f'C_1 = {round(C_1, 1)} м/с \n'
+              f'alfa_1 = {round(alfa_1_grad, 2)} град. \n'
+              f'T_1 = {round(T_1, 1)} К \n'
+              f'T_1_z = {round(T_1_z, 1)} К \n'
+              f'T_w_1_z = {round(T_w_1_z, 1)} К \n'  # Температура на выходе потока из соплового аппарата в относительном движении
+              f'P_1 = {round(P_1)} Па \n'
+              f'W_1 = {round(W_1, 1)} м/с \n'
+              f'beta_1 = {round(beta_1_grad, 2)} град. \n'
+              f'M_c_1 = {round(M_c_1, 3)} \n'
+              f'Re_c_1 = {round(Re_c_1)} \n'
+              f'b_1 = {round(b_1, 4)} м \n'
+              f't_1 / b_1 = {round(t_1_otn, 3)} \n'
+              f'dzeta_1_n = {round(dzeta_1, 4)} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 24)). отношение потерь в сопловом аппарате к располагаемому перепаду на СА
+              f'P_1_z = {round(P_1_z)} Па \n'
               #########################
-              f'G_2 = {G_2} кг/с \n'
-              f'U_2 = {U_2} м/с \n'
-              f'C_2 = {C_2} м/с \n'
-              f'alfa_2 = {alfa_2} град. \n'
-              f'T_2 = {T_2} К \n'
-              f'T_2_z = {T_2_z} К \n'
-              f'T_w_2_z = {T_w_2_z} К \n'
-              f'P_2 = {P_2} Па \n'
-              f'W_2 = {W_2} м/с \n'
-              f'beta_2 = {beta_2} град. \n'
-              f'M_w_2 = {M_w_2} \n'
-              f'Re_w_2 = {Re_w_2} \n'
-              f'b_2 = {b_2} м \n'
-              f't_2 / b_2 = {t_1_otn} \n'
-              f'dzeta_2_n = {dzeta_2} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 53)). суммарная всех вторых дзет
-              f'P_2_y_z = {P_2_y_z} Па \n'
+              f'G_2 = {round(G_2, 2)} кг/с \n'
+              f'U_2 = {round(U_2, 1)} м/с \n'
+              f'C_2 = {round(C_2, 1)} м/с \n'
+              f'alfa_2 = {round(alfa_2_grad, 2)} град. \n'
+              f'T_2 = {round(T_2, 1)} К \n'
+              f'T_2_z = {round(T_2_z, 1)} К \n'
+              f'T_w_2_z = {round(T_w_2_z, 1)} К \n'
+              f'P_2 = {round(P_2)} Па \n'
+              f'W_2 = {round(W_2, 1)} м/с \n'
+              f'beta_2 = {round(beta_2_grad, 2)} град. \n'
+              f'M_w_2 = {round(M_w_2, 3)} \n'
+              f'Re_w_2 = {round(Re_w_2)} \n'
+              f'b_2 = {round(b_2, 4)} м \n'
+              f't_2 / b_2 = {round(t_1_otn, 3)} \n'
+              f'dzeta_2_n = {round(dzeta_2, 4)} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 53)). суммарная всех вторых дзет
+              f'P_2_y_z = {round(P_2_y_z)} Па \n'
               ###########################
-              f'h_u = {h_u} Дж/кг \n'  # 63
-              f'N_3 = {N} Вт \n'  # 72
-              f'kpd_v = {kpd_v} \n'  # 66
-              f'kpd_y_z = {kpd_y_z} \n')  # 76
+              f'h_u = {round(h_u)} Дж/кг \n'  # 63
+              f'N_3 = {round(N)} Вт \n'  # 72
+              f'kpd_v = {round(kpd_v, 4)} \n'  # 66
+              f'kpd_y_z = {round(kpd_y_z, 4)} \n')  # 76
         current_stage += 1
 
     # Параметры турбины
@@ -490,13 +554,12 @@ def main():
     # В данном случае C_2 - абсолютная скорость на выходе из последней ступени
 
     # Вывод результатов расчета турбины
-    # ВСЕ ПРИНТЫ НУЖНО ОКРУГЛИТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # (ВСЕ ОКРУГЛЕНИЯ НУЖНО СОГЛАСОВАТЬ)
 
     print(f'Результаты расчета турбины \n'
-          f'Мoщнocть тypбины = {N_T} Вт \n'
-          f'КПД тypбины пo зaтopмoжeнным пapaмeтpaм = {kpd_T_z} \n'
-          f'КПД тypбины = {kpd_T} \n')
+          f'Мoщнocть тypбины = {round(N_T)} Вт \n'
+          f'КПД тypбины пo зaтopмoжeнным пapaмeтpaм = {round(kpd_T_z, 3)} \n'
+          f'КПД тypбины = {round(kpd_T, 3)} \n')
+
 
 if __name__ == '__main__':
     main()
