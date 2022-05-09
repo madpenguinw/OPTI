@@ -91,8 +91,8 @@ class Input_funcs():
                 value_error = 1
             warning = f'{err_begin} неверное значение газовой постоянной, {err_end}'
             try:
-                R_r = float(data_list[8])
-                if not 0 < R_r:
+                R_g = float(data_list[8])
+                if not 0 < R_g:
                     print(f'{warning} \n{text_condition_err} 0 < x, {text_where_х}')
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
@@ -102,7 +102,7 @@ class Input_funcs():
                 return False
 
             return_data_list = []
-            return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r])
+            return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g])
 
             return return_data_list
 
@@ -210,19 +210,19 @@ class Input_funcs():
                 k_g = -1
         ###
         warning = f'{err_begin} неверное значение газовой постоянной, {err_end}'
-        R_r = -1
-        while R_r < 0:
+        R_g = -1
+        while R_g < 0:
             try:
-                R_r = float(input('Введите значение газовой постоянной (Дж/кг*К) \n'))
-                while not 0 < R_r:
-                    R_r = float(input(f'{warning} \n{text_condition_err} 0 < x, {text_where_х}'))
+                R_g = float(input('Введите значение газовой постоянной (Дж/кг*К) \n'))
+                while not 0 < R_g:
+                    R_g = float(input(f'{warning} \n{text_condition_err} 0 < x, {text_where_х}'))
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
-                R_r = -1
+                R_g = -1
         ###
 
         return_data_list = []
-        return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_r])
+        return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g])
 
         return return_data_list
 
