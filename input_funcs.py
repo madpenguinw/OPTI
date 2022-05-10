@@ -76,8 +76,8 @@ class Input_funcs():
             warning = f'{err_begin} неверную влажность на входе в туpбину (%), {err_end}'
             try:
                 Y_1 = float(data_list[6])
-                if not 0 < Y_1 <= 20:
-                    print(f'{warning} \n{text_condition_err} 0 < Y_1 <= 20, {text_where_х}')
+                if not 0 <= Y_1 <= 20:
+                    print(f'{warning} \n{text_condition_err} 0 <= Y_1 <= 20, {text_where_х}')
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 value_error = 1
@@ -192,8 +192,8 @@ class Input_funcs():
             try:
                 Y_1 = float(input('Введите влажность на входе в туpбину (%) \n'
                                     '(для газовой турбины введите 0). \n'))
-                while not 0 < Y_1 <= 20:
-                    Y_1 = float(input(f'{warning} \n{text_condition_err} 0 < x <= 20, {text_where_х}'))
+                while not 0 <= Y_1 <= 20:
+                    Y_1 = float(input(f'{warning} \n{text_condition_err} 0 <= x <= 20, {text_where_х}'))
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 Y_1 = -1
@@ -311,8 +311,8 @@ class Input_funcs():
         while Y_2 < 0:
             try:
                 Y_2 = float(input('Введите влажность на выходе из ступени (%). \n'))
-                while not 0 < Y_2 < 20:
-                    Y_2 = float(input(f'{warning} \n{text_condition_err} 0 < x < 20, {text_where_х}'))
+                while not 0 <= Y_2 < 20:
+                    Y_2 = float(input(f'{warning} \n{text_condition_err} 0 <= x < 20, {text_where_х}'))
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 Y_2 = -1
@@ -450,8 +450,8 @@ class Input_funcs():
             warning = f'{err_begin} неверную влажность на выходе из ступени (%), {err_end}'
             try:
                 Y_2 = float(Y_2)
-                if not 0 < Y_2 < 20:
-                    print(f'{warning} \n{text_condition_err} 0 < x < 20, {text_where_х}')
+                if not 0 <= Y_2 < 20:
+                    print(f'{warning} \n{text_condition_err} 0 <= x < 20, {text_where_х}')
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 value_error = 1
