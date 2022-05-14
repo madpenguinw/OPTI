@@ -1,5 +1,6 @@
 import math as m
 
+from create_pdf import create_pdf
 from input_funcs import Input_funcs
 
 
@@ -67,6 +68,37 @@ def main():
     P_0_z_list = []
     P_0_z_list.append(P_0_z)
 
+    # Список с исходными данными каждой ступени
+    stage_initial_data = [
+        ['N', 'L_1', 'L_2', 'D_1', 'D_2', 'Z_1', 'Z_2', 'Y_2', 'H_0', 'RHO_T', 'G_OTN', 'Бандаж'],
+        ['—', 'м', 'м', 'м', 'м', '—', '—', '%', 'Дж/кг', '—', '—', '—'],
+    ]
+
+    # Общий список для функции создания pdf
+    data_set = []
+
+    # Создание списков для data_set
+    # Из каждого из этих списков будет сформирована таблица
+    table_1 = [
+        ['N', 'G1', 'U1', 'C1', 'ALFA1', 'T1', 'T1*', 'TW1*', 'P1'],
+        ['—', 'кг/c', 'м/c', 'м/c', 'гpaд', 'К', 'К', 'К', 'Пa'],
+    ]
+    table_2 = [
+        ['N', 'W1', 'BETA1', 'MC1', 'REC1','B1', 'T1/B1', 'DZ1N', 'P1*'],
+        ['—', 'м/c', 'гpaд', '—', '—', 'м', '—', '—', 'Пa'],
+    ]
+    table_3 = [
+        ['N', 'G2', 'U2', 'C2', 'ALFA2', 'T2', 'T2*', 'TW2*', 'P2'],
+        ['—', 'кг/c', 'м/c', 'м/c', 'гpaд', 'К', 'К', 'К', 'Пa'],
+    ]
+    table_4 = [
+        ['N', 'W2', 'BETA2', 'MW2', 'REW2', 'B2', 'Т2/B2', 'DZ2N', 'P2Y*'],
+        ['—', 'м/c', 'гpaд', '—', '—', 'м', '—', '—', 'Пa'],
+    ]
+    table_5 = [
+        ['N', 'HU', 'N3', 'KPDV', 'KPDY*'],
+        ['—', 'Дж/кг', 'Вт', '—', '—'],
+    ]
 
     # Для отдельной ступени
     for current_stage in range(1, j + 1):
@@ -82,6 +114,8 @@ def main():
             (l_1, l_2, d_1, d_2, z_1, z_2, Y_2,
              h_0, rho_t, G_0_otn, bandage) = stage_data_list
 
+        stage_data_list.insert(0, current_stage)
+        stage_initial_data.append(stage_data_list)
         Y_2_list.append(Y_2)
 
         # Расчетные формулы
@@ -494,45 +528,150 @@ def main():
         # 76) КПД ступени по параметрам торможения с учетом потерь в патрубке
         kpd_y_z = N / N_t
 
+        # Округление величин
+        round_G_1 = round(G_1, 2)
+        round_U_1 = round(U_1, 1)
+        round_C_1 = round(C_1, 1)
+        round_alfa_1_grad = round(alfa_1_grad, 2)
+        round_T_1 = round(T_1, 1)
+        round_T_1_z = round(T_1_z, 1)
+        round_T_w_1_z = round(T_w_1_z, 1)
+        round_P_1 = round(P_1)
+        round_W_1 = round(W_1, 1)
+        round_beta_1_grad = round(beta_1_grad, 2)
+        round_M_c_1 = round(M_c_1, 3)
+        round_Re_c_1 = round(Re_c_1)
+        round_b_1 = round(b_1, 4)
+        round_t_1_otn = round(t_1_otn, 3)
+        round_dzeta_1 = round(dzeta_1, 4)
+        round_P_1_z = round(P_1_z)
+        round_G_2 = round(G_2, 2)
+        round_U_2 = round(U_2, 1)
+        round_C_2 = round(C_2, 1)
+        round_alfa_2_grad = round(alfa_2_grad, 2)
+        round_T_2 = round(T_2, 1)
+        round_T_2_z = round(T_2_z, 1)
+        round_T_w_2_z = round(T_w_2_z, 1)
+        round_P_2 = round(P_2)
+        round_W_2 = round(W_2, 1)
+        round_beta_2_grad = round(beta_2_grad, 2)
+        round_M_w_2 = round(M_w_2, 3)
+        round_Re_w_2 = round(Re_w_2)
+        round_b_2 = round(b_2, 4)
+        round_t_2_otn = round(t_2_otn, 3)
+        round_dzeta_2 = round(dzeta_2, 4)
+        round_P_2_y_z = round(P_2_y_z)
+        round_h_u = round(h_u)
+        round_N = round(N)
+        round_kpd_v = round(kpd_v, 4)
+        round_kpd_y_z = round(kpd_y_z, 4)
+
+        # Формирование списка для таблицы №1
+        data_for_table_1 = [
+            current_stage,
+            round_G_1,
+            round_U_1,
+            round_C_1,
+            round_alfa_1_grad,
+            round_T_1,
+            round_T_1_z,
+            round_T_w_1_z,
+            round_P_1
+        ]
+        table_1.append(data_for_table_1)
+
+        # Формирование списка для таблицы №2
+        data_for_table_2 = [
+            current_stage,
+            round_W_1,
+            round_beta_1_grad,
+            round_M_c_1,
+            round_Re_c_1,
+            round_b_1,
+            round_t_1_otn,
+            round_dzeta_1,
+            round_P_1_z
+        ]
+        table_2.append(data_for_table_2)
+
+        # Формирование списка для таблицы №3
+        data_for_table_3 = [
+            current_stage,
+            round_G_2,
+            round_U_2,
+            round_C_2,
+            round_alfa_2_grad,
+            round_T_2,
+            round_T_2_z,
+            round_T_w_2_z,
+            round_P_2
+        ]
+        table_3.append(data_for_table_3)
+
+        # Формирование списка для таблицы №4
+        data_for_table_4 = [
+            current_stage,
+            round_W_2,
+            round_beta_2_grad,
+            round_M_w_2,
+            round_Re_w_2,
+            round_b_2,
+            round_t_2_otn,
+            round_dzeta_2,
+            round_P_2_y_z
+        ]
+        table_4.append(data_for_table_4)
+
+        # Формирование списка для таблицы №5
+        data_for_table_5 = [
+            current_stage,
+            round_h_u,
+            round_N,
+            round_kpd_v,
+            round_kpd_y_z
+        ]
+        table_5.append(data_for_table_5)
+
+
         # Вывод результатов расчета ступени
 
         print(f'\nРезультаты расчета ступени {current_stage} \n'
-              f'G_1 = {round(G_1, 2)} кг/с \n'
-              f'U_1 = {round(U_1, 1)} м/с \n'
-              f'C_1 = {round(C_1, 1)} м/с \n'
-              f'alfa_1 = {round(alfa_1_grad, 2)} град. \n'
-              f'T_1 = {round(T_1, 1)} К \n'
-              f'T_1_z = {round(T_1_z, 1)} К \n'
-              f'T_w_1_z = {round(T_w_1_z, 1)} К \n'
-              f'P_1 = {round(P_1)} Па \n'
-              f'W_1 = {round(W_1, 1)} м/с \n'
-              f'beta_1 = {round(beta_1_grad, 2)} град. \n'
-              f'M_c_1 = {round(M_c_1, 3)} \n'
-              f'Re_c_1 = {round(Re_c_1)} \n'
-              f'b_1 = {round(b_1, 4)} м \n'
-              f't_1 / b_1 = {round(t_1_otn, 3)} \n'
-              f'dzeta_1_n = {round(dzeta_1, 4)} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 24)). отношение потерь в сопловом аппарате к располагаемому перепаду на СА
-              f'P_1_z = {round(P_1_z)} Па \n'
-              f'G_2 = {round(G_2, 2)} кг/с \n'
-              f'U_2 = {round(U_2, 1)} м/с \n'
-              f'C_2 = {round(C_2, 1)} м/с \n'
-              f'alfa_2 = {round(alfa_2_grad, 2)} град. \n'
-              f'T_2 = {round(T_2, 1)} К \n'
-              f'T_2_z = {round(T_2_z, 1)} К \n'
-              f'T_w_2_z = {round(T_w_2_z, 1)} К \n'
-              f'P_2 = {round(P_2)} Па \n'
-              f'W_2 = {round(W_2, 1)} м/с \n'
-              f'beta_2 = {round(beta_2_grad, 2)} град. \n'
-              f'M_w_2 = {round(M_w_2, 3)} \n'
-              f'Re_w_2 = {round(Re_w_2)} \n'
-              f'b_2 = {round(b_2, 4)} м \n'
-              f't_2 / b_2 = {round(t_2_otn, 3)} \n'
-              f'dzeta_2_n = {round(dzeta_2, 4)} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 53)). суммарная всех вторых дзет
-              f'P_2_y_z = {round(P_2_y_z)} Па \n'
-              f'h_u = {round(h_u)} Дж/кг \n'  # 63
-              f'N_3 = {round(N)} Вт \n'  # 72
-              f'kpd_v = {round(kpd_v, 4)} \n'  # 66
-              f'kpd_y_z = {round(kpd_y_z, 4)} \n')  # 76
+              f'G_1 = {round_G_1} кг/с \n'
+              f'U_1 = {round_U_1} м/с \n'
+              f'C_1 = {round_C_1} м/с \n'
+              f'alfa_1 = {round_alfa_1_grad} град. \n'
+              f'T_1 = {round_T_1} К \n'
+              f'T_1_z = {round_T_1_z} К \n'
+              f'T_w_1_z = {round_T_w_1_z} К \n'
+              f'P_1 = {round_P_1} Па \n'
+              f'W_1 = {round_W_1} м/с \n'
+              f'beta_1 = {round_beta_1_grad} град. \n'
+              f'M_c_1 = {round_M_c_1} \n'
+              f'Re_c_1 = {round_Re_c_1} \n'
+              f'b_1 = {round_b_1, 4} м \n'
+              f't_1 / b_1 = {round_t_1_otn} \n'
+              f'dzeta_1_n = {round_dzeta_1} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 24)). отношение потерь в сопловом аппарате к располагаемому перепаду на СА
+              f'P_1_z = {round_P_1_z} Па \n'
+              f'G_2 = {round_G_2, 2} кг/с \n'
+              f'U_2 = {round_U_2, 1} м/с \n'
+              f'C_2 = {round_C_2, 1} м/с \n'
+              f'alfa_2 = {round_alfa_2_grad} град. \n'
+              f'T_2 = {round_T_2, 1} К \n'
+              f'T_2_z = {round_T_2_z} К \n'
+              f'T_w_2_z = {round_T_w_2_z} К \n'
+              f'P_2 = {round_P_2} Па \n'
+              f'W_2 = {round_W_2} м/с \n'
+              f'beta_2 = {round_beta_2_grad} град. \n'
+              f'M_w_2 = {round_M_w_2} \n'
+              f'Re_w_2 = {round_Re_w_2} \n'
+              f'b_2 = {round_b_2, 4} м \n'
+              f't_2 / b_2 = {round_t_2_otn} \n'
+              f'dzeta_2_n = {round_dzeta_2} \n'  # ВОПРОС (уточнить, правильно ли это (форумла 53)). суммарная всех вторых дзет
+              f'P_2_y_z = {round_P_2_y_z} Па \n'
+              f'h_u = {round_h_u} Дж/кг \n'  # 63
+              f'N_3 = {round_N} Вт \n'  # 72
+              f'kpd_v = {round_kpd_v} \n'  # 66
+              f'kpd_y_z = {round_kpd_y_z} \n')  # 76
         current_stage += 1
 
     # Параметры турбины
@@ -551,13 +690,41 @@ def main():
     # В данном случае G_2 - расход через последнюю ступень турбины
     # В данном случае C_2 - абсолютная скорость на выходе из последней ступени
 
+    # Округление величин
+    round_N_T = round(N_T)
+    round_kpd_T_z = round(kpd_T_z, 3)
+    round_kpd_T = round(kpd_T, 3)
+
     # Вывод результатов расчета турбины
 
     print(f'Результаты расчета турбины \n'
-          f'Мoщнocть тypбины = {round(N_T)} Вт \n'
-          f'КПД тypбины пo зaтopмoжeнным пapaмeтpaм = {round(kpd_T_z, 3)} \n'
-          f'КПД тypбины = {round(kpd_T, 3)} \n')
+          f'Мoщнocть тypбины = {round_N_T} Вт \n'
+          f'КПД тypбины пo зaтopмoжeнным пapaмeтpaм = {round_kpd_T_z} \n'
+          f'КПД тypбины = {round_kpd_T} \n')
+
+    # Формирование списка для таблицы №6
+    table_6 = [
+        round_N_T,
+        round_kpd_T_z,
+        round_kpd_T
+    ]
+
+    # Формирование общего списка для ф-ии создания PDF
+    data_for_data_set = [
+        turbine_data_list,
+        stage_initial_data,
+        table_1,
+        table_2,
+        table_3,
+        table_4,
+        table_5,
+        table_6
+    ]
+    for var in data_for_data_set:
+        data_set.append(var)
+
+    return data_set
 
 
 if __name__ == '__main__':
-    main()
+    create_pdf(main())
