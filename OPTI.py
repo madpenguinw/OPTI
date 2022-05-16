@@ -1,6 +1,7 @@
 import math as m
 
-from create_pdf import create_pdf
+# from create_docx import create_docx
+from output_funcs import Output_funcs
 from input_funcs import Input_funcs
 
 
@@ -35,7 +36,7 @@ def main():
 
     # Исходные данные
     file = ''
-    text = ('Считать исходные данные из подготовленного файла text.txt? \n'
+    text = ('Считать исходные данные из подготовленного файла data.txt? \n'
             '(Введите "yes", если да, или "no", если нет) \n')
     while file not in ['yes', 'no']:
 
@@ -727,4 +728,4 @@ def main():
 
 
 if __name__ == '__main__':
-    create_pdf(main())
+    Output_funcs.convert_pdf_to_word(Output_funcs.create_pdf(main()))
