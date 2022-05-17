@@ -1,0 +1,2 @@
+fpdf
+pdf2docx==0.5.1

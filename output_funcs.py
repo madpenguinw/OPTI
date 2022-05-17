@@ -136,9 +136,9 @@ class Output_funcs():
         pdf.output(filename)
         return filename
 
-
+    @staticmethod
     def convert_pdf_to_word(input_file: str, pages: Tuple = None):
-        """Converts pdf to docx"""
+        """Функция конвертирует pdf в docx"""
         docx = '.docx'
         first_part = input_file.split('.')
         output_file = first_part[0] + docx
@@ -149,6 +149,5 @@ class Output_funcs():
         summary = {
             "File": input_file, "Pages": str(pages), "Output File": output_file
         }
-        # Printing Summary
         print("\n".join("{}:{}".format(i, j) for i, j in summary.items()))
         return result

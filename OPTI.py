@@ -1,3 +1,4 @@
+import os.path
 import math as m
 
 # from create_docx import create_docx
@@ -16,23 +17,14 @@ from input_funcs import Input_funcs
 # sh - штрих - параметр в корневом сечении ступени
 # 2sh - 2 штриха - параметр в переферийном сечении ступени
 
-def test_variable(variable, name):
-    '''
-    Функция для тестирования переменных
-    '''
-    try:
-        if variable > 0:
-            return True
-        else:
-            print(f'Ошибка: {name} = {variable}')
-            return False
-    except TypeError:
-        print('TypeError!!!')
-        print(f'{name} =  {variable}')
-        return False
-
 
 def main():
+
+    # Проверка на существование подготовленного файла data.txt
+    if os.path.exists('data.txt'):
+        data_txt = 1
+    else:
+        data_txt = 0
 
     # Исходные данные
     file = ''
@@ -43,19 +35,26 @@ def main():
         file = input(text)
 
         # Для турбины в целом
-
-        if file == 'yes':
-            print('Начинается чтение из файла text.txt')
-            turbine_data_list = Input_funcs.turbine()
+        file_not_found = 0
+        try:
+            if file == 'yes':
+                print('Начинается чтение из файла data.txt')
+                turbine_data_list = Input_funcs.turbine()
+                j, n, P_2_last, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g = turbine_data_list
+            elif file == 'no':
+                print('Начинается ручной ввод данных для турбины в целом')
+                turbine_data_list = Input_funcs.input_turbine(data_txt)
+                j, n, P_2_last, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g = turbine_data_list
+            else:
+                text = ('Вы ввели неверное значение. \n'
+                        'Введите "yes", если хотите считать данные из подготовленного файла text.txt \n'
+                        'Введите "no", если хотите вводить данные вручную \n')
+        except FileNotFoundError:
+            print('Не обнаружен подготовленный файл data.txt \n'
+                  'Начинается ручной ввод данных для турбины в целом')
+            file_not_found = 1
+            turbine_data_list = Input_funcs.input_turbine(data_txt)
             j, n, P_2_last, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g = turbine_data_list
-        elif file == 'no':
-            print('Начинается ручной ввод данных для турбины в целом')
-            turbine_data_list = Input_funcs.input_turbine()
-            j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g = turbine_data_list
-        else:
-            text = ('Вы ввели неверное значение. \n'
-                    'Введите "yes", если хотите считать данные из подготовленного файла text.txt \n'
-                    'Введите "no", если хотите вводить данные вручную \n')
 
     # Объявление списков перед циклом
     N_list = []
@@ -104,14 +103,14 @@ def main():
     # Для отдельной ступени
     for current_stage in range(1, j + 1):
 
-        if file == 'yes':
+        if file == 'yes' and file_not_found == 0:
             stage_data_list = Input_funcs.stage(current_stage)
             (l_1, l_2, d_1, d_2, z_1, z_2, Y_2,
              h_0, rho_t, G_0_otn, bandage) = stage_data_list
-        elif file == 'no':
+        else:
             print('Начинается ручной ввод данных для каждой ступени \n'
                   f'Для {current_stage} ступени:')
-            stage_data_list = Input_funcs.input_stage()
+            stage_data_list = Input_funcs.input_stage(data_txt)
             (l_1, l_2, d_1, d_2, z_1, z_2, Y_2,
              h_0, rho_t, G_0_otn, bandage) = stage_data_list
 

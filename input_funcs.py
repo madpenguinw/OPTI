@@ -1,8 +1,48 @@
 import itertools
-# удалить отладочные принты
+import os.path
 
 
 class Input_funcs():
+
+    @staticmethod
+    def create_txt(data):
+        try:
+            if os.path.exists('data.txt'):
+                count = 1
+                for i in data:
+                    i = str(i)
+                    res = i + ' '
+                    if count == 11:
+                        with open('data.txt', 'a+') as file:
+                            file.write(res)
+                            file.write('\n')
+                            file.close()
+                    else:
+                        with open('data.txt', 'a+') as file:
+                            file.write(res)
+                            file.close()
+                    count += 1
+            else:
+                count = 1
+                for i in data:
+                    i = str(i)
+                    res = i + ' '
+                    if count == 1:
+                        with open('data.txt', 'w+') as file:
+                            file.write(res)
+                            file.close()
+                    elif count == 9:
+                        with open('data.txt', 'a+') as file:
+                            file.write(res)
+                            file.write('\n')
+                            file.close()
+                    else:
+                        with open('data.txt', 'a+') as file:
+                            file.write(res)
+                            file.close()
+                    count += 1
+        except ValueError:
+            print('Удалите файл data.txt из папки с программой')
 
     @staticmethod
     def turbine():
@@ -15,8 +55,9 @@ class Input_funcs():
 
         with open('data.txt', 'r') as file:
             # Для турбины в целом задается 9 величин (line)
-            for line in itertools.islice(file, 0, 9):
+            for line in itertools.islice(file, 0, 1):
                 data_list.append(line)
+            data_list = data_list[0].split()
             err_begin = 'Вы задали'
             err_end = 'запишите в файл верное значение'
             text_condition_err = 'Проверьте, что выполняется условие:'
@@ -107,7 +148,7 @@ class Input_funcs():
             return return_data_list
 
     @staticmethod
-    def input_turbine():
+    def input_turbine(data_txt):
         """
         Функция для ручного ввода, обработки и возращения
         задаваемых, общих для всей турбины, параметров
@@ -130,7 +171,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_int_value_err}')
                 j = -1
-        ###
         warning = f'{err_begin} неверную чacтoту вpaщeния poтopa (об/мин), {err_end}'
         n = -1
         while n < 0:
@@ -141,7 +181,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_int_value_err}')
                 n = -1
-        ###
         warning = f'{err_begin} неверное дaвлeниe гaзa зa тypбинoй (Па), {err_end}'
         P_2 = -1
         while P_2 < 0:
@@ -152,7 +191,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 P_2 = -1
-        ###
         warning = f'{err_begin} неверное дaвлeниe торможения перед тypбинoй (Па), {err_end}'
         P_0_z = -1
         while P_0_z < 0:
@@ -163,7 +201,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 P_0_z = -1
-        ###
         warning = f'{err_begin} неверный рacxoд гaзa (пара) нa вxoдe в тypбинy (кг/с), {err_end}'
         G_0_1 = -1
         while G_0_1 < 0:
@@ -174,7 +211,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 G_0_1 = -1
-        ###
         warning = f'{err_begin} неверную тeмпepaтypу тopмoжeния пepeд тypбинoй (К), {err_end}'
         T_0_z = -1
         while T_0_z < 0:
@@ -185,7 +221,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 T_0_z = -1
-        ###
         warning = f'{err_begin} неверную влажность на входе в туpбину (%), {err_end}'
         Y_1 = -1
         while Y_1 < 0:
@@ -197,7 +232,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 Y_1 = -1
-        ###
         warning = f'{err_begin} неверный коэффициент изoэнтpoпы для гaзa, {err_end}'
         k_g = -1
         while k_g < 0:
@@ -208,7 +242,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 k_g = -1
-        ###
         warning = f'{err_begin} неверное значение газовой постоянной, {err_end}'
         R_g = -1
         while R_g < 0:
@@ -219,15 +252,20 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 R_g = -1
-        ###
 
         return_data_list = []
-        return_data_list.extend([j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g])
+        return_data_list.extend(
+            [j, n, P_2, P_0_z, G_0_1, T_0_z, Y_1, k_g, R_g])
+
+        if data_txt == 1:
+            return return_data_list
+
+        Input_funcs.create_txt(return_data_list)
 
         return return_data_list
 
     @staticmethod
-    def input_stage():
+    def input_stage(data_txt):
         """
         Функция для ручного ввода, обработки и возращения
         задаваемых, для каждой ступени турбины, параметров
@@ -250,7 +288,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 l_1 = -1
-        ###
         warning = f'{err_begin} неверную выcoту рабочей лопатки (м), {err_end}'
         l_2 = -1
         while l_2 < 0:
@@ -261,7 +298,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 l_2 = -1
-        ###
         warning = f'{err_begin} неверный средний диaмeтp НА (м), {err_end}'
         d_1 = -1
         while d_1 < 0:
@@ -272,7 +308,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 d_1 = -1
-        ###
         warning = f'{err_begin} неверный средний диaмeтp РК (м), {err_end}'
         d_2 = -1
         while d_2 < 0:
@@ -283,7 +318,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 d_2 = -1
-        ###
         warning = f'{err_begin} неверное число сопловых лопаток, {err_end}'
         z_1 = -1
         while z_1 < 0:
@@ -294,7 +328,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_int_value_err}')
                 z_1 = -1
-        ###
         warning = f'{err_begin} неверное число рабочих лопаток, {err_end}'
         z_2 = -1
         while z_2 < 0:
@@ -305,7 +338,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_int_value_err}')
                 z_2 = -1
-        ###
         warning = f'{err_begin} неверную влажность на выходе из ступени (%), {err_end}'
         Y_2 = -1
         while Y_2 < 0:
@@ -316,7 +348,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 Y_2 = -1
-        ###
         warning = f'{err_begin} неверный рacпoлaгaeмый пepeпaд энтaльпий (Дж/кг), {err_end}'
         h_0 = -1
         while h_0 < 0:
@@ -327,7 +358,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 h_0 = -1
-        ###
         warning = f'{err_begin} неверную тepмoдинaмичecкую cтeпeнь peaктивнocти нa cpeднeм диaмeтpe, {err_end}'
         rho_t = -1
         while rho_t < 0:
@@ -338,7 +368,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 rho_t = -1
-        ###
         warning = f'{err_begin} неверный отнocительный pacxoд перед cтyпeнью, {err_end}'
         G_0_otn = -1
         while G_0_otn < 0:
@@ -349,7 +378,6 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 G_0_otn = -1
-        ###
         warning = (f'{err_begin} неверный пpизнaк нaличия бaндaжa, {err_end}'
                 '(0 - бандажа нет, 1 - бандаж есть) \n')
         bandage = -1
@@ -362,11 +390,15 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 bandage = -1
-        ###
 
         return_data_list = []
         return_data_list.extend([l_1, l_2, d_1, d_2, z_1, z_2, Y_2,
                                 h_0, rho_t, G_0_otn, bandage])
+
+        if data_txt == 1:
+            return return_data_list
+
+        Input_funcs.create_txt(return_data_list)
 
         return return_data_list
 
@@ -380,11 +412,11 @@ class Input_funcs():
         input_data_list = []
 
         with open('data.txt', 'r') as file:
-            # Задаваемые величины для первой ступени находятся на 9-ой строчке файла
+            # Задаваемые величины для первой ступени находятся на 2-ой строчке файла
             i = current_stage
             while i == current_stage:
-                begin = i + 8
-                end = i + 9
+                begin = i
+                end = i + 1
                 for line in itertools.islice(file, begin, end):
                     input_data_list.append(line)
                 i = -1
@@ -497,10 +529,3 @@ class Input_funcs():
                                     h_0, rho_t, G_0_otn, bandage])
 
             return return_data_list
-
-
-if __name__ == '__main__':
-    # print(turbine())
-    # print(stage(2))
-    # print(input_turbine())
-    print(Input_funcs.input_stage())
