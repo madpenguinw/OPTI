@@ -242,7 +242,7 @@ class Input_funcs():
             except ValueError:
                 print(f'{warning} \n{text_float_value_err}')
                 k_g = -1
-        warning = f'{err_begin} неверное значение газовой постоянной, {err_end}'
+        warning = f'{err_begin} неверное значение газовой постоянной (Дж/кг*К), {err_end}'
         R_g = -1
         while R_g < 0:
             try:
