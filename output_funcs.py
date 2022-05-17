@@ -13,7 +13,7 @@ class Output_funcs():
 
     @staticmethod
     def create_pdf(data_set):
-        (turbine, stage, table_1, table_2,
+        (file_name, turbine, stage, table_1, table_2,
             table_3, table_4, table_5, table_6) = data_set
 
         pdf = FPDF()
@@ -132,9 +132,15 @@ class Output_funcs():
         Output_funcs.print_text(pdf, f'КПД тypбины пo зaтopмoжeнным пapaмeтpaм = {val_2}')
         Output_funcs.print_text(pdf, f'КПД тypбины = {val_3}')
 
-        filename = 'Results.pdf'
-        pdf.output(filename)
-        return filename
+        file_name = str(file_name) + '.pdf'
+        try:
+            pdf.output(file_name)
+        except FileNotFoundError:
+            file_name = 'Results.pdf'
+            pdf.output(file_name)
+            print('Было выбрано недопустимо имя для файлов с результатами расчетов\n'
+                  'Установленно значение по умолчанию (Results.pdf и Results.docx)\n')
+        return file_name
 
     @staticmethod
     def convert_pdf_to_word(input_file: str, pages: Tuple = None):
